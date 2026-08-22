@@ -7,8 +7,9 @@ export async function synchroniser() {
 
   const supabase = createClient()
 
-  // 1. Synchroniser les ventes en attente
-  const ventesEnAttente = await offlineDB.ventes.where('synced').equals(0 as unknown as boolean).toArray()
+  // 1. Synchroniser les ventes en attente (filtre en mémoire : "synced" n'est pas indexé,
+  //    plus simple et plus sûr que d'indexer un booléen dans IndexedDB)
+  const ventesEnAttente = (await offlineDB.ventes.toArray()).filter((v) => !v.synced)
   for (const vente of ventesEnAttente) {
     const { data, error } = await supabase
       .from('ventes')
@@ -33,7 +34,7 @@ export async function synchroniser() {
   }
 
   // 2. Synchroniser les dépenses en attente
-  const depensesEnAttente = await offlineDB.depenses.where('synced').equals(0 as unknown as boolean).toArray()
+  const depensesEnAttente = (await offlineDB.depenses.toArray()).filter((d) => !d.synced)
   for (const depense of depensesEnAttente) {
     const { error } = await supabase.from('depenses').insert({
       boutique_id: depense.boutique_id,

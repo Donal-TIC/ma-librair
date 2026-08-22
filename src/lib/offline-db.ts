@@ -48,8 +48,8 @@ class MaLibrairDB extends Dexie {
   constructor() {
     super('ma-librair-offline')
     this.version(1).stores({
-      ventes: '++id, uuid, synced, created_at',
-      depenses: '++id, uuid, synced, created_at',
+      ventes: '++id, uuid, created_at',
+      depenses: '++id, uuid, created_at',
       articles_cache: 'id, code_barre',
     })
   }
