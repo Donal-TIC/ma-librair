@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import type { ArticleFormData } from './actions'
+import type { ArticleFormData } from '@/app/admin/articles/actions'
 
 interface Props {
   boutiques: { id: string; nom: string }[]
