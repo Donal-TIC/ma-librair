@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --couleur-principale: #7c3aed; /* violet */
+  --couleur-fond: #ffffff;       /* blanc */
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+  .btn-secondary {
+    @apply bg-white border border-primary-200 hover:bg-primary-50 text-primary-700 font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+  .card {
+    @apply bg-white border border-gray-100 rounded-xl shadow-sm p-4;
+  }
+  .input-field {
+    @apply w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+}
+
+@media print {
+  aside, header, form, .btn-secondary, .btn-primary {
+    display: none !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  svg, svg * {
+    visibility: visible;
+  }
+}
