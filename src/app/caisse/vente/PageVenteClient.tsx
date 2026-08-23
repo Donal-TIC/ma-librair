@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { offlineDB, type ArticleCache } from '@/lib/offline-db'
+import { createClient } from '@/lib/supabase/client'
 import { rechercherOuCreerClient } from '../actions'
 import ScannerCodeBarre from '@/components/ScannerCodeBarre'
 import { IconePoubelle, IconePlus, IconeMoins, IconePanier } from '@/components/icones'
@@ -62,6 +63,15 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
     if (!articleTrouve) return
     const prixApplique = venteEnGros ? prixGros : articleTrouve.prix_vente
 
+    // Notification stock insuffisant : on compare à la quantité déjà mise dans le panier
+    const dejaAuPanier = panier
+      .filter((l) => l.article_id === articleTrouve.id)
+      .reduce((s, l) => s + l.quantite, 0)
+    if (dejaAuPanier + quantite > articleTrouve.quantite_stock) {
+      alert(`Stock insuffisant : il ne reste que ${articleTrouve.quantite_stock} unité(s) de "${articleTrouve.nom}" (dont ${dejaAuPanier} déjà dans le panier).`)
+      return
+    }
+
     setPanier((prev) => {
       const existant = prev.find((l) => l.article_id === articleTrouve.id && l.est_gros === venteEnGros && l.prix_unitaire === prixApplique)
       if (existant) {
@@ -116,6 +126,18 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
     if (totalPaye < total) {
       alert('Le montant payé est inférieur au total. Complétez le paiement avant de valider.')
       return
+    }
+
+    // Notification "session expirée" : on vérifie que la session est toujours ouverte
+    // avant d'enregistrer la vente (uniquement possible si le réseau est disponible ;
+    // hors-ligne, la vente continue normalement et sera vérifiée à la synchronisation).
+    if (navigator.onLine) {
+      const supabase = createClient()
+      const { data: sessionActuelle } = await supabase.from('sessions_caisse').select('statut').eq('id', sessionId).maybeSingle()
+      if (sessionActuelle && sessionActuelle.statut !== 'ouverte') {
+        alert("Votre session de caisse a été fermée. Ouvrez une nouvelle session avant de continuer à vendre.")
+        return
+      }
     }
 
     // Rattachement du client (facultatif) — ne bloque jamais la vente si ça échoue (ex : hors-ligne)

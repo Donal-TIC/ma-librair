@@ -102,3 +102,57 @@ export async function rechercherOuCreerClient(boutiqueId: string, nom: string, t
 
   return data
 }
+
+export async function annulerVente(venteId: string, motif: string) {
+  const { supabase, boutiqueId, user } = await utilisateurConnecte()
+
+  const { data: vente } = await supabase.from('ventes').select('id, annulee').eq('id', venteId).single()
+  if (!vente) throw new Error('Vente introuvable.')
+  if (vente.annulee) throw new Error('Cette vente est déjà annulée.')
+
+  const { data: lignes } = await supabase.from('lignes_vente').select('id, article_id, quantite').eq('vente_id', venteId)
+
+  for (const ligne of lignes ?? []) {
+    const { data: article } = await supabase.from('articles').select('quantite_stock').eq('id', ligne.article_id).single()
+    if (!article) continue
+    await supabase.from('articles').update({ quantite_stock: article.quantite_stock + ligne.quantite }).eq('id', ligne.article_id)
+    await supabase.from('mouvements_stock').insert({
+      boutique_id: boutiqueId,
+      article_id: ligne.article_id,
+      type: 'retour',
+      quantite: ligne.quantite,
+      quantite_avant: article.quantite_stock,
+      quantite_apres: article.quantite_stock + ligne.quantite,
+      motif: 'Annulation de vente : ' + motif,
+      effectue_par: user.id,
+    })
+  }
+
+  const { error } = await supabase.from('ventes').update({ annulee: true }).eq('id', venteId)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/caisse/historique')
+}
+
+export async function creerRetour(donnees: { venteId: string; ligneVenteId: string; quantite: number; motif: string; montantRembourse: number }) {
+  const { supabase, boutiqueId, user } = await utilisateurConnecte()
+
+  const { error } = await supabase.from('retours').insert({
+    vente_id: donnees.venteId,
+    ligne_vente_id: donnees.ligneVenteId,
+    boutique_id: boutiqueId,
+    quantite: donnees.quantite,
+    motif: donnees.motif,
+    montant_rembourse: donnees.montantRembourse,
+    effectue_par: user.id,
+  })
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/caisse/retours')
+}
+
+export async function changerMotDePasse(nouveauMotDePasse: string) {
+  const { supabase } = await utilisateurConnecte()
+  const { error } = await supabase.auth.updateUser({ password: nouveauMotDePasse })
+  if (error) throw new Error(error.message)
+}

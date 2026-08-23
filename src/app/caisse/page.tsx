@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { IconePanier, IconeUtilisateurs, IconeStock, IconeDepense, IconeFinances } from '@/components/icones'
+import { IconePanier, IconeUtilisateurs, IconeStock, IconeDepense, IconeFinances, IconeMoins } from '@/components/icones'
 
 export default async function TableauDeBordCaisse() {
   const supabase = createClient()
@@ -38,8 +38,11 @@ export default async function TableauDeBordCaisse() {
     { href: '/caisse/vente', label: 'Nouvelle vente', Icone: IconePanier },
     { href: '/caisse/clients', label: 'Clients', Icone: IconeUtilisateurs },
     { href: '/caisse/historique', label: 'Historique', Icone: IconeStock },
+    { href: '/caisse/retours', label: 'Retours', Icone: IconeMoins },
     { href: '/caisse/depenses', label: 'Dépenses', Icone: IconeDepense },
+    { href: '/caisse/rapport', label: 'Rapport du jour', Icone: IconeFinances },
     { href: '/caisse/fermeture', label: 'Fermer la caisse', Icone: IconeFinances },
+    { href: '/caisse/mot-de-passe', label: 'Mot de passe', Icone: IconeUtilisateurs },
   ]
 
   return (
