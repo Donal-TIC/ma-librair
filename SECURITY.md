@@ -4,7 +4,7 @@
 - Les clés Supabase ne sont **jamais écrites en dur** dans le code : elles vivent uniquement dans `.env.local` (en local) et dans les variables d'environnement Vercel (en production).
 - `.env.local` est exclu de Git via `.gitignore` — il ne sera **jamais poussé sur GitHub**.
 - Seule la clé "anon" de Supabase est utilisée côté application. Cette clé est *conçue pour être publique* : ce qui protège réellement les données, ce sont les règles RLS (Row Level Security) côté base de données, pas le secret de la clé.
-- ⚠️ La clé **`service_role`** de Supabase (accès total, qui contourne la sécurité) n'est utilisée nulle part dans ce projet et ne doit **jamais** être placée dans du code exécuté côté navigateur, ni committée sur GitHub. Si un jour elle est nécessaire (tâche d'administration serveur), elle doit être stockée uniquement dans les variables d'environnement Vercel, marquée "Sensitive/Secret".
+- ⚠️ La clé **`service_role`** de Supabase (accès total, qui contourne la sécurité) est utilisée **uniquement côté serveur**, dans `src/app/admin/boutiques/actions.ts`, pour permettre à l'administrateur de créer des comptes caissiers. Elle est stockée sous le nom `SUPABASE_SERVICE_ROLE_KEY` (jamais préfixée par `NEXT_PUBLIC_`, donc jamais envoyée au navigateur) et doit être marquée "Sensitive" dans les variables d'environnement Vercel.
 
 ## Protection de la base de données
 - **Row Level Security (RLS) activée sur toutes les tables** : chaque utilisateur ne peut lire/écrire que les données de sa propre boutique.

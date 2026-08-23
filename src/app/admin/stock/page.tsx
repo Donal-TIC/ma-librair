@@ -39,12 +39,12 @@ export default async function PageStock({
 
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
-          <form className="flex gap-3 mb-4" method="get">
-            <select name="boutique" defaultValue={searchParams.boutique ?? ''} className="input-field max-w-xs">
+          <form className="flex flex-col sm:flex-row gap-3 mb-4" method="get">
+            <select name="boutique" defaultValue={searchParams.boutique ?? ''} className="input-field sm:max-w-xs">
               <option value="">Toutes les boutiques</option>
               {boutiques?.map((b) => <option key={b.id} value={b.id}>{b.nom}</option>)}
             </select>
-            <select name="type" defaultValue={searchParams.type ?? ''} className="input-field max-w-xs">
+            <select name="type" defaultValue={searchParams.type ?? ''} className="input-field sm:max-w-xs">
               <option value="">Tous les types</option>
               {Object.entries(libellesType).map(([val, label]) => <option key={val} value={val}>{label}</option>)}
             </select>

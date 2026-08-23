@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function DashboardAdmin() {
@@ -23,7 +24,7 @@ export default async function DashboardAdmin() {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Tableau de bord</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {cartes.map((c) => (
           <div key={c.label} className="card">
             <p className="text-sm text-gray-500">{c.label}</p>
@@ -31,9 +32,9 @@ export default async function DashboardAdmin() {
           </div>
         ))}
       </div>
-      <p className="text-sm text-gray-400 mt-8">
-        Les sections « Boutiques », « Articles », « Stock » et « Finances » se complètent dans les prochaines étapes.
-      </p>
+      <Link href="/admin/finances" className="text-primary-600 hover:underline text-sm">
+        Voir le détail des finances (bénéfices, dépenses, pertes, budget) →
+      </Link>
     </div>
   )
 }

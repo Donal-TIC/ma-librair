@@ -24,19 +24,19 @@ export default async function PageArticles({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Articles & stock</h2>
-        <Link href="/admin/articles/nouveau" className="btn-primary">+ Nouvel article</Link>
+        <Link href="/admin/articles/nouveau" className="btn-primary text-center">+ Nouvel article</Link>
       </div>
 
-      <form className="flex gap-3 mb-4" method="get">
+      <form className="flex flex-col sm:flex-row gap-3 mb-4" method="get">
         <input
           name="recherche"
           defaultValue={searchParams.recherche}
           placeholder="Rechercher par nom ou code-barre..."
-          className="input-field max-w-xs"
+          className="input-field sm:max-w-xs"
         />
-        <select name="boutique" defaultValue={searchParams.boutique ?? ''} className="input-field max-w-xs">
+        <select name="boutique" defaultValue={searchParams.boutique ?? ''} className="input-field sm:max-w-xs">
           <option value="">Toutes les boutiques</option>
           {boutiques?.map((b) => (
             <option key={b.id} value={b.id}>{b.nom}</option>

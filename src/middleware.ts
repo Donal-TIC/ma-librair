@@ -35,9 +35,14 @@ export async function middleware(request: NextRequest) {
   if (user && estZoneProtegee) {
     const { data: profil } = await supabase
       .from('profils')
-      .select('role')
+      .select('role, actif')
       .eq('id', user.id)
       .single()
+
+    if (profil?.actif === false) {
+      await supabase.auth.signOut()
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
 
     // Un caissier ne peut pas accéder à /admin, et inversement pas de blocage strict
     // pour l'admin sur /caisse (il peut superviser), à ajuster selon besoin.

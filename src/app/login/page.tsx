@@ -31,9 +31,16 @@ export default function LoginPage() {
     // On récupère le profil pour savoir où rediriger l'utilisateur
     const { data: profil } = await supabase
       .from('profils')
-      .select('role')
+      .select('role, actif')
       .eq('id', data.user.id)
       .single()
+
+    if (profil && profil.actif === false) {
+      await supabase.auth.signOut()
+      setErreur("Ce compte a été désactivé. Contactez votre administrateur.")
+      setChargement(false)
+      return
+    }
 
     if (profil?.role === 'admin') {
       router.push('/admin')

@@ -69,7 +69,7 @@ export default function ArticleForm({ boutiques, categories, fournisseurs, valeu
         <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="input-field" rows={2} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
           <select value={form.categorie_id ?? ''} onChange={(e) => setForm({ ...form, categorie_id: e.target.value || null })} className="input-field">
@@ -86,7 +86,7 @@ export default function ArticleForm({ boutiques, categories, fournisseurs, valeu
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Prix d'achat (FCFA)</label>
           <input required type="number" step="0.01" min="0" value={form.prix_achat} onChange={(e) => setForm({ ...form, prix_achat: Number(e.target.value) })} className="input-field" />
@@ -97,7 +97,7 @@ export default function ArticleForm({ boutiques, categories, fournisseurs, valeu
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Quantité en stock</label>
           <input required type="number" min="0" value={form.quantite_stock} onChange={(e) => setForm({ ...form, quantite_stock: Number(e.target.value) })} className="input-field" />

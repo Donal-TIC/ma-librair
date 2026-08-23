@@ -18,7 +18,7 @@
     @apply bg-white border border-gray-100 rounded-xl shadow-sm p-4;
   }
   .input-field {
-    @apply w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full border border-gray-200 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
   }
 }
 
