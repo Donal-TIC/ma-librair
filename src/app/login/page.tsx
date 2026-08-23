@@ -1,97 +1,37 @@
-'use client'
+import Link from 'next/link'
+import { IconeLibrairie, IconeTableauDeBord, IconePanier } from '@/components/icones'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { IconeLibrairie } from '@/components/icones'
-
-export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [motDePasse, setMotDePasse] = useState('')
-  const [erreur, setErreur] = useState('')
-  const [chargement, setChargement] = useState(false)
-  const router = useRouter()
-
-  async function seConnecter(e: React.FormEvent) {
-    e.preventDefault()
-    setErreur('')
-    setChargement(true)
-    const supabase = createClient()
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password: motDePasse,
-    })
-
-    if (error) {
-      setErreur("Identifiants incorrects. Vérifiez votre email et mot de passe.")
-      setChargement(false)
-      return
-    }
-
-    // On récupère le profil pour savoir où rediriger l'utilisateur
-    const { data: profil } = await supabase
-      .from('profils')
-      .select('role, actif')
-      .eq('id', data.user.id)
-      .single()
-
-    if (profil && profil.actif === false) {
-      await supabase.auth.signOut()
-      setErreur("Ce compte a été désactivé. Contactez votre administrateur.")
-      setChargement(false)
-      return
-    }
-
-    if (profil?.role === 'admin') {
-      router.push('/admin')
-    } else {
-      router.push('/caisse')
-    }
-  }
-
+export default function ChoixConnexion() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-primary-50 px-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-primary-600/20">
-            <IconeLibrairie className="w-7 h-7 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-primary-700">Ma librair</h1>
-          <p className="text-gray-500 mt-1">Connectez-vous à votre espace</p>
+      <div className="w-full max-w-sm text-center">
+        <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-primary-600/20">
+          <IconeLibrairie className="w-7 h-7 text-white" />
         </div>
+        <h1 className="text-3xl font-bold text-primary-700">Ma librair</h1>
+        <p className="text-gray-500 mt-1 mb-8">Connectez-vous à votre espace</p>
 
-        <form onSubmit={seConnecter} className="card space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-field"
-              placeholder="vous@exemple.com"
-            />
-          </div>
+        <div className="space-y-3">
+          <Link href="/login/admin" className="card flex items-center gap-3 hover:border-primary-300 transition-colors text-left">
+            <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
+              <IconeTableauDeBord className="w-5 h-5 text-primary-700" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800">Administrateur</p>
+              <p className="text-xs text-gray-500">Gestion complète des boutiques</p>
+            </div>
+          </Link>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-            <input
-              type="password"
-              required
-              value={motDePasse}
-              onChange={(e) => setMotDePasse(e.target.value)}
-              className="input-field"
-              placeholder="••••••••"
-            />
-          </div>
-
-          {erreur && <p className="text-red-600 text-sm">{erreur}</p>}
-
-          <button type="submit" disabled={chargement} className="btn-primary w-full">
-            {chargement ? 'Connexion...' : 'Se connecter'}
-          </button>
-        </form>
+          <Link href="/login/caissier" className="card flex items-center gap-3 hover:border-primary-300 transition-colors text-left">
+            <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
+              <IconePanier className="w-5 h-5 text-primary-700" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800">Caissier</p>
+              <p className="text-xs text-gray-500">Accès à la caisse de votre boutique</p>
+            </div>
+          </Link>
+        </div>
       </div>
     </main>
   )

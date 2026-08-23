@@ -9,11 +9,13 @@ export interface VenteLocale {
   uuid: string
   boutique_id: string
   caissier_id: string
+  session_id: string
+  client_id: string | null
   numero_recu: string
   montant_total: number
   montant_paye: number
   monnaie_rendue: number
-  mode_paiement: string
+  paiements: { mode: 'especes' | 'carte' | 'mobile_money'; montant: number }[]
   lignes: { article_id: string; nom_article: string; prix_unitaire: number; quantite: number; sous_total: number; est_gros: boolean; prix_reference: number; prix_achat_reference: number }[]
   created_at: string
   synced: boolean

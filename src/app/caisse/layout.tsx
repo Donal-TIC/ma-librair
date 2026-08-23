@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { IconeLibrairie, IconePanier, IconeDepense } from '@/components/icones'
+import { IconeLibrairie, IconeTableauDeBord, IconePanier, IconeDepense } from '@/components/icones'
 
 export default function CaisseLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +11,9 @@ export default function CaisseLayout({ children }: { children: React.ReactNode }
         </div>
         <nav className="flex gap-4 text-sm">
           <Link href="/caisse" className="flex items-center gap-1.5 hover:underline">
+            <IconeTableauDeBord className="w-4 h-4" /> Accueil
+          </Link>
+          <Link href="/caisse/vente" className="flex items-center gap-1.5 hover:underline">
             <IconePanier className="w-4 h-4" /> Vente
           </Link>
           <Link href="/caisse/depenses" className="flex items-center gap-1.5 hover:underline">

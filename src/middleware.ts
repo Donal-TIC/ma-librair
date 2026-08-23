@@ -29,7 +29,8 @@ export async function middleware(request: NextRequest) {
   const estZoneProtegee = chemin.startsWith('/admin') || chemin.startsWith('/caisse')
 
   if (estZoneProtegee && !user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const pageConnexion = chemin.startsWith('/admin') ? '/login/admin' : '/login/caissier'
+    return NextResponse.redirect(new URL(pageConnexion, request.url))
   }
 
   if (user && estZoneProtegee) {
@@ -41,7 +42,8 @@ export async function middleware(request: NextRequest) {
 
     if (profil?.actif === false) {
       await supabase.auth.signOut()
-      return NextResponse.redirect(new URL('/login', request.url))
+      const pageConnexion = chemin.startsWith('/admin') ? '/login/admin' : '/login/caissier'
+      return NextResponse.redirect(new URL(pageConnexion, request.url))
     }
 
     // Un caissier ne peut pas accéder à /admin, et inversement pas de blocage strict

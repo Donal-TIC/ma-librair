@@ -16,11 +16,12 @@ export async function synchroniser() {
       .insert({
         boutique_id: vente.boutique_id,
         caissier_id: vente.caissier_id,
+        session_id: vente.session_id,
+        client_id: vente.client_id,
         numero_recu: vente.numero_recu,
         montant_total: vente.montant_total,
         montant_paye: vente.montant_paye,
         monnaie_rendue: vente.monnaie_rendue,
-        mode_paiement: vente.mode_paiement,
         created_at: vente.created_at,
       })
       .select()
@@ -29,6 +30,9 @@ export async function synchroniser() {
     if (!error && data) {
       const lignes = vente.lignes.map((l) => ({ ...l, vente_id: data.id }))
       await supabase.from('lignes_vente').insert(lignes)
+      if (vente.paiements.length > 0) {
+        await supabase.from('paiements_vente').insert(vente.paiements.map((p) => ({ ...p, vente_id: data.id })))
+      }
       await offlineDB.ventes.update(vente.id!, { synced: true })
     }
   }
