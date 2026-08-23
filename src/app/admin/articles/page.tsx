@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import BoutonSupprimer from './BoutonSupprimer'
+import { IconeAlerte } from '@/components/icones'
 
 export default async function PageArticles({
   searchParams,
@@ -69,8 +70,8 @@ export default async function PageArticles({
                   <td className="py-2">{Number(a.prix_achat).toLocaleString('fr-FR')} FCFA</td>
                   <td className="py-2">{Number(a.prix_vente).toLocaleString('fr-FR')} FCFA</td>
                   <td className="py-2">
-                    <span className={stockBas ? 'text-red-600 font-semibold' : ''}>
-                      {a.quantite_stock}{stockBas && ' ⚠️'}
+                    <span className={stockBas ? 'text-red-600 font-semibold inline-flex items-center gap-1' : ''}>
+                      {a.quantite_stock}{stockBas && <IconeAlerte className="w-3.5 h-3.5" />}
                     </span>
                   </td>
                   <td className="py-2 text-right space-x-3">

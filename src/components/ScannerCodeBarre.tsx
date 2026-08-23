@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { IconeScan } from './icones'
 
 interface Props {
   onCodeDetecte: (code: string) => void
@@ -45,8 +46,9 @@ export default function ScannerCodeBarre({ onCodeDetecte }: Props) {
 
   return (
     <div>
-      <button type="button" onClick={() => setActif((a) => !a)} className="btn-secondary text-sm w-full">
-        {actif ? 'Arrêter la caméra' : '📷 Scanner avec la caméra'}
+      <button type="button" onClick={() => setActif((a) => !a)} className="btn-secondary text-sm w-full flex items-center justify-center gap-2">
+        <IconeScan className="w-4 h-4" />
+        {actif ? 'Arrêter la caméra' : 'Scanner avec la caméra'}
       </button>
       {actif && <div id="zone-scanner" ref={conteneurRef} className="mt-2 rounded-lg overflow-hidden" />}
     </div>

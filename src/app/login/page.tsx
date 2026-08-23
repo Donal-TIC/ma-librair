@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { IconeLibrairie } from '@/components/icones'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -53,6 +54,9 @@ export default function LoginPage() {
     <main className="min-h-screen flex items-center justify-center bg-primary-50 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
+          <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-primary-600/20">
+            <IconeLibrairie className="w-7 h-7 text-white" />
+          </div>
           <h1 className="text-3xl font-bold text-primary-700">Ma librair</h1>
           <p className="text-gray-500 mt-1">Connectez-vous à votre espace</p>
         </div>
