@@ -32,8 +32,11 @@ export default async function DashboardAdmin() {
           </div>
         ))}
       </div>
-      <Link href="/admin/finances" className="text-primary-600 hover:underline text-sm">
+      <Link href="/admin/finances" className="text-primary-600 hover:underline text-sm block">
         Voir le détail des finances (bénéfices, dépenses, pertes, budget) →
+      </Link>
+      <Link href="/admin/rapport-journalier" className="text-primary-600 hover:underline text-sm block mt-2">
+        Imprimer le rapport de fin de journée →
       </Link>
     </div>
   )

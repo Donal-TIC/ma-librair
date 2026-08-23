@@ -15,6 +15,8 @@ export interface ArticleFormData {
   quantite_stock: number
   seuil_alerte: number
   image_url: string | null
+  prix_gros: number | null
+  quantite_min_gros: number
 }
 
 // Vérifie que l'utilisateur connecté est bien admin avant toute écriture.

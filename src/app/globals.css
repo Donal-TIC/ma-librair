@@ -23,13 +23,7 @@
 }
 
 @media print {
-  aside, header, form, .btn-secondary, .btn-primary {
+  aside, header, nav, form, button {
     display: none !important;
-  }
-  body * {
-    visibility: hidden;
-  }
-  svg, svg * {
-    visibility: visible;
   }
 }

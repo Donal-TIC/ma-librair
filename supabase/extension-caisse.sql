@@ -101,6 +101,8 @@ create trigger trg_traiter_retour after insert on retours
 -- ---------------------------------------------------------
 alter table articles add column if not exists auteur text;
 alter table articles add column if not exists isbn text;
+alter table articles add column if not exists prix_gros numeric(12,2);
+alter table articles add column if not exists quantite_min_gros integer default 1;
 
 -- ---------------------------------------------------------
 -- SÉCURITÉ (RLS) SUR LES NOUVELLES TABLES

@@ -58,7 +58,7 @@ export default function NavAdmin() {
                   actif ? 'bg-primary-600 text-white font-medium' : 'text-primary-50 hover:bg-primary-600'
                 }`}
               >
-                <lien.Icone className="w-4.5 h-4.5 shrink-0" />
+                <lien.Icone className="w-5 h-5 shrink-0" />
                 {lien.label}
               </Link>
             )

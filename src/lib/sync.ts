@@ -55,7 +55,7 @@ export async function synchroniser() {
   // 3. Rafraîchir le cache local des articles (pour vendre hors-ligne avec les bons prix/stocks)
   const { data: articles } = await supabase
     .from('articles')
-    .select('id, boutique_id, code_barre, nom, prix_achat, prix_vente, quantite_stock')
+    .select('id, boutique_id, code_barre, nom, prix_achat, prix_vente, prix_gros, quantite_min_gros, quantite_stock')
   if (articles) {
     await offlineDB.articles_cache.clear()
     await offlineDB.articles_cache.bulkPut(articles)

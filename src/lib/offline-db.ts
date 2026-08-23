@@ -39,6 +39,8 @@ export interface ArticleCache {
   nom: string
   prix_achat: number
   prix_vente: number
+  prix_gros: number | null
+  quantite_min_gros: number
   quantite_stock: number
 }
 

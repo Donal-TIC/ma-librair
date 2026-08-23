@@ -25,6 +25,8 @@ export default function ArticleForm({ boutiques, categories, fournisseurs, valeu
     quantite_stock: valeursInitiales?.quantite_stock ?? 0,
     seuil_alerte: valeursInitiales?.seuil_alerte ?? 5,
     image_url: null,
+    prix_gros: valeursInitiales?.prix_gros ?? null,
+    quantite_min_gros: valeursInitiales?.quantite_min_gros ?? 1,
   })
   const [erreur, setErreur] = useState('')
   const [enCours, demarrer] = useTransition()
@@ -105,6 +107,29 @@ export default function ArticleForm({ boutiques, categories, fournisseurs, valeu
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Seuil d'alerte stock bas</label>
           <input required type="number" min="0" value={form.seuil_alerte} onChange={(e) => setForm({ ...form, seuil_alerte: Number(e.target.value) })} className="input-field" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Prix de gros minimum (FCFA)</label>
+          <input
+            type="number" step="0.01" min="0"
+            value={form.prix_gros ?? ''}
+            onChange={(e) => setForm({ ...form, prix_gros: e.target.value ? Number(e.target.value) : null })}
+            className="input-field"
+            placeholder="Laisser vide si pas de vente en gros"
+          />
+          <p className="text-xs text-gray-400 mt-1">La caisse ne pourra jamais vendre en dessous de ce prix.</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Quantité minimum pour le prix de gros</label>
+          <input
+            type="number" min="1"
+            value={form.quantite_min_gros}
+            onChange={(e) => setForm({ ...form, quantite_min_gros: Number(e.target.value) })}
+            className="input-field"
+          />
         </div>
       </div>
 

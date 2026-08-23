@@ -24,22 +24,24 @@ export default async function ModifierArticle({ params }: { params: { id: string
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-2">Modifier l'article</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-2 print:hidden">Modifier l'article</h2>
 
       <div className="card max-w-xl mb-4 flex items-center justify-between">
         <BarcodeImage value={article.code_barre} />
         <BoutonImprimer />
       </div>
 
-      <ArticleForm
-        boutiques={boutiques ?? []}
-        categories={categories ?? []}
-        fournisseurs={fournisseurs ?? []}
-        valeursInitiales={article}
-        codeBarre={article.code_barre}
-        onValider={valider}
-        libelleBouton="Enregistrer les modifications"
-      />
+      <div className="print:hidden">
+        <ArticleForm
+          boutiques={boutiques ?? []}
+          categories={categories ?? []}
+          fournisseurs={fournisseurs ?? []}
+          valeursInitiales={article}
+          codeBarre={article.code_barre}
+          onValider={valider}
+          libelleBouton="Enregistrer les modifications"
+        />
+      </div>
     </div>
   )
 }

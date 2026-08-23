@@ -39,10 +39,18 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
   const totalPaye = paiementEspeces + paiementCarte + paiementMobileMoney
   const monnaie = totalPaye - total
 
+  // Si l'admin a défini un prix de gros minimum pour cet article, c'est un plancher STRICT :
+  // vendre en dessous signifie vendre à perte, et c'est signalé clairement au caissier.
+  // Sinon (aucun prix de gros défini), on retombe sur l'ancien contrôle par marge (10% du bénéfice normal).
+  const planchier = articleTrouve?.prix_gros ?? null
   const beneficeNormal = articleTrouve ? articleTrouve.prix_vente - articleTrouve.prix_achat : 0
   const beneficeApplique = articleTrouve ? prixGros - articleTrouve.prix_achat : 0
-  const remiseExcessive = venteEnGros && articleTrouve && beneficeNormal > 0
+  const enDessousDuPlancher = venteEnGros && articleTrouve && planchier !== null ? prixGros < planchier : false
+  const remiseExcessive = venteEnGros && articleTrouve && planchier === null && beneficeNormal > 0
     ? beneficeApplique < beneficeNormal * 0.1
+    : false
+  const quantiteInsuffisantePourGros = venteEnGros && articleTrouve && articleTrouve.quantite_min_gros > 1
+    ? quantite < articleTrouve.quantite_min_gros
     : false
 
   async function rechercherArticle(code: string) {
@@ -226,8 +234,25 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
 
           {venteEnGros && (
             <div>
+              {articleTrouve.prix_gros !== null && (
+                <p className="text-xs text-gray-500 mb-1">
+                  Prix de gros minimum fixé par l'administrateur : {articleTrouve.prix_gros.toLocaleString('fr-FR')} FCFA
+                  {articleTrouve.quantite_min_gros > 1 && ` (à partir de ${articleTrouve.quantite_min_gros} unités)`}
+                </p>
+              )}
               <label className="block text-sm font-medium text-gray-700 mb-1">Prix unitaire négocié (FCFA)</label>
               <input type="number" min={0} value={prixGros} onChange={(e) => setPrixGros(Number(e.target.value))} className="input-field" />
+
+              {quantiteInsuffisantePourGros && (
+                <p className="text-orange-600 text-xs mt-1">
+                  Le prix de gros n'est normalement accordé qu'à partir de {articleTrouve.quantite_min_gros} unités.
+                </p>
+              )}
+              {enDessousDuPlancher && (
+                <p className="text-red-600 text-xs mt-1 font-medium">
+                  ⚠ Ce prix est en dessous du prix de gros minimum ({articleTrouve.prix_gros?.toLocaleString('fr-FR')} FCFA) : vous vendez à perte.
+                </p>
+              )}
               {remiseExcessive && (
                 <p className="text-red-600 text-xs mt-1">
                   Bénéfice trop faible : ce prix fait descendre le bénéfice sous 10% de celui normalement attendu par la boutique sur cet article.
@@ -239,7 +264,13 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
             </div>
           )}
 
-          <button onClick={ajouterAuPanier} className="btn-primary w-full">Ajouter au panier</button>
+          <button
+            onClick={ajouterAuPanier}
+            disabled={enDessousDuPlancher}
+            className="btn-primary w-full disabled:opacity-40"
+          >
+            {enDessousDuPlancher ? 'Prix trop bas — impossible' : 'Ajouter au panier'}
+          </button>
         </div>
       )}
 
