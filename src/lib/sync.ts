@@ -55,9 +55,29 @@ export async function synchroniser() {
   // 3. Rafraîchir le cache local des articles (pour vendre hors-ligne avec les bons prix/stocks)
   const { data: articles } = await supabase
     .from('articles')
-    .select('id, boutique_id, code_barre, nom, prix_achat, prix_vente, prix_gros, quantite_min_gros, quantite_stock')
+    .select('id, boutique_id, code_barre, nom, prix_achat, prix_vente, prix_gros, quantite_min_gros, quantite_stock, categorie_id')
+
+  // Promotions actives aujourd'hui : on calcule le prix promo à appliquer par article
+  const aujourdHui = new Date().toISOString().slice(0, 10)
+  const { data: promotions } = await supabase
+    .from('promotions')
+    .select('article_id, categorie_id, type, valeur')
+    .eq('actif', true)
+    .lte('date_debut', aujourdHui)
+    .gte('date_fin', aujourdHui)
+
   if (articles) {
+    const articlesAvecPromo = articles.map((a) => {
+      const promo = (promotions ?? []).find((p) => p.article_id === a.id || (p.categorie_id && p.categorie_id === (a as any).categorie_id))
+      const prixPromo = promo
+        ? promo.type === 'pourcentage'
+          ? Math.max(0, a.prix_vente * (1 - Number(promo.valeur) / 100))
+          : Math.max(0, a.prix_vente - Number(promo.valeur))
+        : null
+      const { categorie_id, ...articleSansCategorie } = a as any
+      return { ...articleSansCategorie, prix_promo: prixPromo }
+    })
     await offlineDB.articles_cache.clear()
-    await offlineDB.articles_cache.bulkPut(articles)
+    await offlineDB.articles_cache.bulkPut(articlesAvecPromo)
   }
 }

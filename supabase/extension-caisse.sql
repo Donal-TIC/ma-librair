@@ -169,6 +169,34 @@ create index idx_achats_boutique on achats(boutique_id);
 create index idx_achats_fournisseur on achats(fournisseur_id);
 
 -- ---------------------------------------------------------
+-- PROMOTIONS
+-- ---------------------------------------------------------
+create table promotions (
+  id uuid primary key default uuid_generate_v4(),
+  boutique_id uuid references boutiques(id) not null,
+  article_id uuid references articles(id),
+  categorie_id uuid references categories(id),
+  type text not null check (type in ('pourcentage', 'fixe')),
+  valeur numeric(12,2) not null,
+  date_debut date not null,
+  date_fin date not null,
+  actif boolean default true,
+  created_by uuid references auth.users(id),
+  created_at timestamptz default now(),
+  check (article_id is not null or categorie_id is not null),
+  check (date_fin >= date_debut)
+);
+
+alter table lignes_vente add column if not exists est_promo boolean default false;
+
+alter table promotions enable row level security;
+create policy "promotions_all" on promotions for all
+  using (boutique_id = current_user_boutique() or boutique_id in (select id from boutiques where created_by = auth.uid()));
+
+create index idx_promotions_boutique on promotions(boutique_id);
+create index idx_promotions_dates on promotions(date_debut, date_fin);
+
+-- ---------------------------------------------------------
 -- TRANSFERTS ENTRE BOUTIQUES
 -- ---------------------------------------------------------
 create table transferts (

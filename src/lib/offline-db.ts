@@ -16,7 +16,7 @@ export interface VenteLocale {
   montant_paye: number
   monnaie_rendue: number
   paiements: { mode: 'especes' | 'carte' | 'mobile_money'; montant: number }[]
-  lignes: { article_id: string; nom_article: string; prix_unitaire: number; quantite: number; sous_total: number; est_gros: boolean; prix_reference: number; prix_achat_reference: number }[]
+  lignes: { article_id: string; nom_article: string; prix_unitaire: number; quantite: number; sous_total: number; est_gros: boolean; est_promo: boolean; prix_reference: number; prix_achat_reference: number }[]
   created_at: string
   synced: boolean
 }
@@ -39,6 +39,7 @@ export interface ArticleCache {
   nom: string
   prix_achat: number
   prix_vente: number
+  prix_promo: number | null
   prix_gros: number | null
   quantite_min_gros: number
   quantite_stock: number

@@ -3,15 +3,17 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { IconeLibrairie, IconeTableauDeBord, IconeBoutique, IconeArticle, IconeStock, IconeFinances, IconeTransfert, IconeInventaire, IconeUtilisateurs, IconeAchat, IconePanier, IconeRecherche, IconeMenu, IconeFermer } from './icones'
+import { IconeLibrairie, IconeTableauDeBord, IconeBoutique, IconeArticle, IconeStock, IconeFinances, IconeTransfert, IconeInventaire, IconeUtilisateurs, IconeAchat, IconePanier, IconeRecherche, IconeNotification, IconePromotion, IconeMenu, IconeFermer } from './icones'
 import BoutonDeconnexion from './BoutonDeconnexion'
 
 const liens = [
   { href: '/admin', label: 'Tableau de bord', Icone: IconeTableauDeBord },
+  { href: '/admin/notifications', label: 'Notifications', Icone: IconeNotification },
   { href: '/admin/recherche', label: 'Recherche', Icone: IconeRecherche },
   { href: '/admin/boutiques', label: 'Boutiques & caisses', Icone: IconeBoutique },
   { href: '/admin/ventes', label: 'Ventes', Icone: IconePanier },
   { href: '/admin/articles', label: 'Articles & stock', Icone: IconeArticle },
+  { href: '/admin/promotions', label: 'Promotions', Icone: IconePromotion },
   { href: '/admin/stock', label: 'Mouvements de stock', Icone: IconeStock },
   { href: '/admin/stock-global', label: 'Stock global', Icone: IconeStock },
   { href: '/admin/transferts', label: 'Transferts', Icone: IconeTransfert },

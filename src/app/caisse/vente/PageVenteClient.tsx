@@ -14,6 +14,7 @@ interface LignePanier {
   quantite: number
   sous_total: number
   est_gros: boolean
+  est_promo: boolean
   prix_reference: number
   prix_achat_reference: number
 }
@@ -69,7 +70,9 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
 
   function ajouterAuPanier() {
     if (!articleTrouve) return
-    const prixApplique = venteEnGros ? prixGros : articleTrouve.prix_vente
+    // Priorité : prix négocié en gros > prix promo actif > prix normal
+    const prixApplique = venteEnGros ? prixGros : (articleTrouve.prix_promo ?? articleTrouve.prix_vente)
+    const estPromo = !venteEnGros && articleTrouve.prix_promo !== null
 
     // Notification stock insuffisant : on compare à la quantité déjà mise dans le panier
     const dejaAuPanier = panier
@@ -98,6 +101,7 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
           quantite,
           sous_total: prixApplique * quantite,
           est_gros: venteEnGros,
+          est_promo: estPromo,
           prix_reference: articleTrouve.prix_vente,
           prix_achat_reference: articleTrouve.prix_achat,
         },
@@ -210,6 +214,9 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
             <div>
               <p className="font-semibold">{articleTrouve.nom}</p>
               <p className="text-sm text-gray-500">Prix normal : {articleTrouve.prix_vente.toLocaleString('fr-FR')} FCFA</p>
+              {articleTrouve.prix_promo !== null && (
+                <p className="text-sm text-green-600 font-medium">Prix promo : {articleTrouve.prix_promo.toLocaleString('fr-FR')} FCFA</p>
+              )}
             </div>
             <button onClick={() => setArticleTrouve(null)} className="text-gray-400 text-sm">✕</button>
           </div>
@@ -289,6 +296,7 @@ export default function PageVenteClient({ sessionId, boutiqueId, caissierId }: {
               <p className="truncate font-medium">
                 {l.nom_article}
                 {l.est_gros && <span className="text-primary-600 text-xs ml-1">(prix de gros)</span>}
+                {l.est_promo && <span className="text-green-600 text-xs ml-1">(promo)</span>}
               </p>
               <p className="text-gray-400 text-xs">{l.prix_unitaire.toLocaleString('fr-FR')} FCFA / unité</p>
             </div>

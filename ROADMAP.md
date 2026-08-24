@@ -37,6 +37,8 @@ Construite par phases pour garder une qualité fiable à chaque étape.
 - **Ventes (vue admin)** : toutes boutiques, filtrable (boutique, dates, moyen de paiement), détail complet par vente
 - **Export CSV** : articles, mouvements de stock, ventes (compatible Excel)
 - **Recherche globale** (articles, clients, fournisseurs, boutiques, ventes, transferts, achats, utilisateurs)
+- **Notifications** (ruptures, stock faible, écarts de caisse, transferts/achats en attente — calculées en direct)
+- **Promotions** (remise % ou montant fixe, sur un article ou toute une catégorie, période définie, appliquée automatiquement en caisse)
 - Graphiques par boutique/catégorie/produit
 - Export PDF/Excel/CSV
 - Performance des boutiques et des caissiers (classements)
