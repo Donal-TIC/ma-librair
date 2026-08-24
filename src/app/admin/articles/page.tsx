@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import BoutonSupprimer from './BoutonSupprimer'
+import BoutonExporterCSV from '@/components/BoutonExporterCSV'
 import { IconeAlerte } from '@/components/icones'
 
 export default async function PageArticles({
@@ -23,11 +24,23 @@ export default async function PageArticles({
 
   const { data: articles } = await requete
 
+  const donneesExport = (articles ?? []).map((a: any) => ({
+    nom: a.nom,
+    code_barre: a.code_barre,
+    boutique: a.boutiques?.nom ?? '',
+    prix_achat: a.prix_achat,
+    prix_vente: a.prix_vente,
+    stock: a.quantite_stock,
+  }))
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Articles & stock</h2>
-        <Link href="/admin/articles/nouveau" className="btn-primary text-center">+ Nouvel article</Link>
+        <div className="flex gap-2">
+          <BoutonExporterCSV donnees={donneesExport} nomFichier="articles" />
+          <Link href="/admin/articles/nouveau" className="btn-primary text-center">+ Nouvel article</Link>
+        </div>
       </div>
 
       <form className="flex flex-col sm:flex-row gap-3 mb-4" method="get">

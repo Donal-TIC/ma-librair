@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import FormulaireAjustement from './FormulaireAjustement'
+import BoutonExporterCSV from '@/components/BoutonExporterCSV'
 
 const libellesType: Record<string, string> = {
   entree: 'Entrée',
@@ -33,9 +34,23 @@ export default async function PageStock({
 
   const { data: mouvements } = await requete
 
+  const donneesExport = (mouvements ?? []).map((m: any) => ({
+    date: new Date(m.created_at).toLocaleString('fr-FR'),
+    article: m.articles?.nom ?? '',
+    boutique: m.boutiques?.nom ?? '',
+    type: libellesType[m.type] ?? m.type,
+    quantite: m.quantite,
+    stock_avant: m.quantite_avant,
+    stock_apres: m.quantite_apres,
+    motif: m.motif ?? '',
+  }))
+
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Mouvements de stock</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Mouvements de stock</h2>
+        <BoutonExporterCSV donnees={donneesExport} nomFichier="mouvements-stock" />
+      </div>
 
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2">

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { IconeLibrairie, IconeTableauDeBord, IconePanier, IconeDepense } from '@/components/icones'
+import BoutonDeconnexion from '@/components/BoutonDeconnexion'
 
 export default function CaisseLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,7 +10,7 @@ export default function CaisseLayout({ children }: { children: React.ReactNode }
           <IconeLibrairie className="w-6 h-6" />
           <h1 className="font-bold text-lg">Ma librair — Caisse</h1>
         </div>
-        <nav className="flex gap-4 text-sm">
+        <nav className="flex items-center gap-4 text-sm">
           <Link href="/caisse" className="flex items-center gap-1.5 hover:underline">
             <IconeTableauDeBord className="w-4 h-4" /> Accueil
           </Link>
@@ -19,6 +20,7 @@ export default function CaisseLayout({ children }: { children: React.ReactNode }
           <Link href="/caisse/depenses" className="flex items-center gap-1.5 hover:underline">
             <IconeDepense className="w-4 h-4" /> Dépenses
           </Link>
+          <BoutonDeconnexion className="text-primary-100 hover:text-white hover:underline" />
         </nav>
       </header>
       <main className="p-4">{children}</main>

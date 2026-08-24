@@ -16,22 +16,27 @@ Construite par phases pour garder une qualité fiable à chaque étape.
 - Rapport de fin de journée admin (imprimable, toutes boutiques ou filtré)
 - Rapport journalier caissier (ses propres ventes uniquement)
 - Journal d'audit automatique (créations/modifications/suppressions tracées)
+- **Transferts entre boutiques** (créer/expédier, réceptionner totalement ou partiellement, historique)
+- **Inventaire** (comptage réel vs stock théorique, écart avec justification obligatoire, correction automatique du stock à la clôture)
+- **Stock global multi-boutiques** (vue consolidée par article, détail par boutique)
+- **Fournisseurs** (création, modification, désactivation)
+- **Achats fournisseurs** : commandes, réception progressive (partielle possible, plusieurs fois), retours fournisseurs, annulation si rien reçu
 - Sécurité : RLS par boutique, refus par défaut, aucune donnée sensible dans le code
+- Déconnexion (admin et caissier)
 
 ## 🚧 Prochaines phases (dans l'ordre du cahier des charges)
 
 **Phase 3 complément — Stock avancé**
-- Transferts entre boutiques (créer, expédier, réceptionner, réception partielle)
-- Inventaire (stock théorique vs compté, écart, justification)
-- Stock global multi-boutiques (vue consolidée par article)
+(terminé)
 
 **Phase 4 — Achats fournisseurs**
-- Commandes fournisseurs (brouillon → commandée → reçue)
-- Réception (partielle ou totale)
-- Retours fournisseurs
+(terminé)
 
 **Phase 9 — Rapports & statistiques avancés**
-- Tableau de bord admin enrichi (CA jour/semaine/mois/année, comparatifs boutiques, top produits)
+- Tableau de bord admin enrichi : fait ✅ (CA jour/semaine/mois/année, activité complète, alertes stock, top/flop produits, boutiques performantes, graphique 30 jours, filtre par boutique)
+- **Ventes (vue admin)** : toutes boutiques, filtrable (boutique, dates, moyen de paiement), détail complet par vente
+- **Export CSV** : articles, mouvements de stock, ventes (compatible Excel)
+- **Recherche globale** (articles, clients, fournisseurs, boutiques, ventes, transferts, achats, utilisateurs)
 - Graphiques par boutique/catégorie/produit
 - Export PDF/Excel/CSV
 - Performance des boutiques et des caissiers (classements)

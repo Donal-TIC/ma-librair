@@ -104,6 +104,160 @@ alter table articles add column if not exists isbn text;
 alter table articles add column if not exists prix_gros numeric(12,2);
 alter table articles add column if not exists quantite_min_gros integer default 1;
 
+-- Compléments à la table fournisseurs (créée dans schema.sql avec nom/telephone/adresse seulement)
+alter table fournisseurs add column if not exists personne_contact text;
+alter table fournisseurs add column if not exists conditions_paiement text;
+alter table fournisseurs add column if not exists notes text;
+alter table fournisseurs add column if not exists actif boolean default true;
+
+-- ---------------------------------------------------------
+-- ACHATS FOURNISSEURS
+-- ---------------------------------------------------------
+create table achats (
+  id uuid primary key default uuid_generate_v4(),
+  numero text not null unique,
+  fournisseur_id uuid references fournisseurs(id) not null,
+  boutique_id uuid references boutiques(id) not null,
+  statut text not null default 'commandee' check (statut in ('brouillon', 'commandee', 'partiellement_recue', 'recue', 'annulee')),
+  montant_total numeric(12,2) not null default 0,
+  created_by uuid references auth.users(id),
+  created_at timestamptz default now()
+);
+
+create table achats_lignes (
+  id uuid primary key default uuid_generate_v4(),
+  achat_id uuid references achats(id) on delete cascade not null,
+  article_id uuid references articles(id) not null,
+  nom_article text not null,
+  quantite_commandee integer not null,
+  quantite_recue integer not null default 0,
+  prix_achat_unitaire numeric(12,2) not null
+);
+
+create table retours_fournisseurs (
+  id uuid primary key default uuid_generate_v4(),
+  achat_id uuid references achats(id) not null,
+  boutique_id uuid references boutiques(id) not null,
+  article_id uuid references articles(id) not null,
+  nom_article text not null,
+  quantite integer not null,
+  motif text not null,
+  effectue_par uuid references auth.users(id),
+  created_at timestamptz default now()
+);
+
+create sequence if not exists achat_numero_seq;
+create or replace function generer_numero_achat()
+returns text as $$
+begin
+  return 'ACH-' || extract(year from now()) || '-' || lpad(nextval('achat_numero_seq')::text, 6, '0');
+end;
+$$ language plpgsql security definer;
+
+alter table achats enable row level security;
+alter table achats_lignes enable row level security;
+alter table retours_fournisseurs enable row level security;
+
+create policy "achats_all" on achats for all
+  using (boutique_id = current_user_boutique() or boutique_id in (select id from boutiques where created_by = auth.uid()));
+create policy "achats_lignes_all" on achats_lignes for all
+  using (achat_id in (select id from achats));
+create policy "retours_fournisseurs_all" on retours_fournisseurs for all
+  using (boutique_id = current_user_boutique() or boutique_id in (select id from boutiques where created_by = auth.uid()));
+
+create index idx_achats_boutique on achats(boutique_id);
+create index idx_achats_fournisseur on achats(fournisseur_id);
+
+-- ---------------------------------------------------------
+-- TRANSFERTS ENTRE BOUTIQUES
+-- ---------------------------------------------------------
+create table transferts (
+  id uuid primary key default uuid_generate_v4(),
+  numero text not null unique,
+  boutique_source_id uuid references boutiques(id) not null,
+  boutique_destination_id uuid references boutiques(id) not null,
+  statut text not null default 'expedie' check (statut in ('expedie', 'partiellement_recu', 'recu', 'annule')),
+  created_by uuid references auth.users(id),
+  created_at timestamptz default now(),
+  recu_at timestamptz,
+  check (boutique_source_id <> boutique_destination_id)
+);
+
+create table transferts_lignes (
+  id uuid primary key default uuid_generate_v4(),
+  transfert_id uuid references transferts(id) on delete cascade not null,
+  article_id uuid references articles(id) not null,
+  nom_article text not null,
+  quantite_envoyee integer not null,
+  quantite_recue integer
+);
+
+create sequence if not exists transfert_numero_seq;
+create or replace function generer_numero_transfert()
+returns text as $$
+begin
+  return 'TRF-' || extract(year from now()) || '-' || lpad(nextval('transfert_numero_seq')::text, 6, '0');
+end;
+$$ language plpgsql security definer;
+
+alter table transferts enable row level security;
+alter table transferts_lignes enable row level security;
+
+create policy "transferts_all" on transferts for all
+  using (
+    boutique_source_id in (select id from boutiques where created_by = auth.uid())
+    or boutique_destination_id in (select id from boutiques where created_by = auth.uid())
+  );
+
+create policy "transferts_lignes_all" on transferts_lignes for all
+  using (transfert_id in (select id from transferts));
+
+create index idx_transferts_source on transferts(boutique_source_id);
+create index idx_transferts_destination on transferts(boutique_destination_id);
+
+-- ---------------------------------------------------------
+-- INVENTAIRES
+-- ---------------------------------------------------------
+create table inventaires (
+  id uuid primary key default uuid_generate_v4(),
+  numero text not null unique,
+  boutique_id uuid references boutiques(id) not null,
+  statut text not null default 'en_cours' check (statut in ('en_cours', 'termine')),
+  created_by uuid references auth.users(id),
+  created_at timestamptz default now(),
+  termine_at timestamptz
+);
+
+create table inventaires_lignes (
+  id uuid primary key default uuid_generate_v4(),
+  inventaire_id uuid references inventaires(id) on delete cascade not null,
+  article_id uuid references articles(id) not null,
+  nom_article text not null,
+  stock_theorique integer not null,
+  stock_compte integer,
+  ecart integer,
+  justification text
+);
+
+create sequence if not exists inventaire_numero_seq;
+create or replace function generer_numero_inventaire()
+returns text as $$
+begin
+  return 'INV-' || extract(year from now()) || '-' || lpad(nextval('inventaire_numero_seq')::text, 6, '0');
+end;
+$$ language plpgsql security definer;
+
+alter table inventaires enable row level security;
+alter table inventaires_lignes enable row level security;
+
+create policy "inventaires_all" on inventaires for all
+  using (boutique_id = current_user_boutique() or boutique_id in (select id from boutiques where created_by = auth.uid()));
+
+create policy "inventaires_lignes_all" on inventaires_lignes for all
+  using (inventaire_id in (select id from inventaires));
+
+create index idx_inventaires_boutique on inventaires(boutique_id);
+
 -- ---------------------------------------------------------
 -- SÉCURITÉ (RLS) SUR LES NOUVELLES TABLES
 -- ---------------------------------------------------------

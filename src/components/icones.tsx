@@ -133,3 +133,40 @@ export function IconeAlerte({ className = 'w-4 h-4' }: { className?: string }) {
     </svg>
   )
 }
+
+export function IconeTransfert({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 3l4 4-4 4" /><path d="M3 11V9a2 2 0 0 1 2-2h16" />
+      <path d="M7 21l-4-4 4-4" /><path d="M21 13v2a2 2 0 0 1-2 2H3" />
+    </svg>
+  )
+}
+
+export function IconeInventaire({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z" />
+      <rect x="5" y="6" width="14" height="15" rx="2" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  )
+}
+
+export function IconeAchat({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.8h9.2a2 2 0 0 0 2-1.6L22 7H6" />
+      <path d="M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM19 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+      <path d="M9 9l1.5 1.5L14 7" />
+    </svg>
+  )
+}
+
+export function IconeRecherche({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.35-4.35" />
+    </svg>
+  )
+}

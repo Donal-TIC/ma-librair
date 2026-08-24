@@ -3,13 +3,21 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { IconeLibrairie, IconeTableauDeBord, IconeBoutique, IconeArticle, IconeStock, IconeFinances, IconeMenu, IconeFermer } from './icones'
+import { IconeLibrairie, IconeTableauDeBord, IconeBoutique, IconeArticle, IconeStock, IconeFinances, IconeTransfert, IconeInventaire, IconeUtilisateurs, IconeAchat, IconePanier, IconeRecherche, IconeMenu, IconeFermer } from './icones'
+import BoutonDeconnexion from './BoutonDeconnexion'
 
 const liens = [
   { href: '/admin', label: 'Tableau de bord', Icone: IconeTableauDeBord },
+  { href: '/admin/recherche', label: 'Recherche', Icone: IconeRecherche },
   { href: '/admin/boutiques', label: 'Boutiques & caisses', Icone: IconeBoutique },
+  { href: '/admin/ventes', label: 'Ventes', Icone: IconePanier },
   { href: '/admin/articles', label: 'Articles & stock', Icone: IconeArticle },
   { href: '/admin/stock', label: 'Mouvements de stock', Icone: IconeStock },
+  { href: '/admin/stock-global', label: 'Stock global', Icone: IconeStock },
+  { href: '/admin/transferts', label: 'Transferts', Icone: IconeTransfert },
+  { href: '/admin/inventaires', label: 'Inventaires', Icone: IconeInventaire },
+  { href: '/admin/fournisseurs', label: 'Fournisseurs', Icone: IconeUtilisateurs },
+  { href: '/admin/achats', label: 'Achats', Icone: IconeAchat },
   { href: '/admin/finances', label: 'Finances', Icone: IconeFinances },
 ]
 
@@ -64,6 +72,9 @@ export default function NavAdmin() {
             )
           })}
         </nav>
+        <div className="px-3 py-4 border-t border-primary-600/50 mt-2">
+          <BoutonDeconnexion className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-primary-100 hover:bg-primary-600 w-full text-left" />
+        </div>
       </aside>
     </>
   )
