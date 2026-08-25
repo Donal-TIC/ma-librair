@@ -1,72 +1,90 @@
-# Ma librair
+# La librairie de Katiola
 
-Application de gestion pour librairie : stock, ventes, caisses, finances, code-barres, mode hors-ligne.
+Application de gestion de librairie multi-boutiques, multi-utilisateurs — caisse (POS), stock, achats, ventes, retours, dépenses, rapports. Construite sur Next.js (App Router) + TypeScript + Supabase + Tailwind CSS, installable en PWA.
 
-## Stack
-- **Next.js 14** (React) — frontend, en PWA installable sur Android et iPhone
-- **Supabase** — base de données Postgres + authentification + stockage
-- **Vercel** — hébergement gratuit avec déploiement automatique
-- **Dexie (IndexedDB)** — stockage local pour le mode hors-ligne
+## ⚠️ État du projet — à lire avant de démarrer
 
-## État actuel (fondations posées)
-- ✅ Structure du projet Next.js
-- ✅ Schéma complet de base de données (`supabase/schema.sql`) avec sécurité par boutique (RLS)
-- ✅ Page de connexion + redirection selon le rôle (admin / caissier)
-- ✅ Squelette espace admin (tableau de bord)
-- ✅ Squelette espace caisse (vente + dépenses) avec sauvegarde locale hors-ligne
-- ✅ Génération de code-barres (composant `BarcodeImage`)
-- ⬜ Pages détaillées : gestion des articles, mouvements de stock, finances complètes, gestion des boutiques/caissiers — **prochaines étapes**
+Ce dépôt a été généré à partir du cahier des charges complet fourni. Le **socle est réellement fonctionnel et connecté à Supabase** (pas de données statiques ni de faux JSON) :
 
-## 1. Mettre en place Supabase (gratuit)
-1. Créez un compte sur https://supabase.com et un nouveau projet.
-2. Allez dans **SQL Editor**, copiez-collez le contenu de `supabase/schema.sql` et exécutez-le. Cela crée toutes les tables, la sécurité et les automatismes (ex : le stock qui se décrémente automatiquement après une vente).
-3. Allez dans **Authentication > Providers**, activez "Email".
-4. Créez votre premier compte admin dans **Authentication > Users > Add user**, puis ajoutez une ligne correspondante dans la table `profils` avec `role = 'admin'`.
-5. Récupérez votre URL et clé "anon" dans **Project Settings > API**.
+**Implémenté et fonctionnel :**
+- Schéma Supabase complet (migrations `0001` → `0010`) : profils, rôles, permissions, boutiques multi-tenant, catalogue produits, stock par boutique, achats, caisses/sessions, **ventes atomiques via transaction Postgres**, retours avec contrôle anti-abus, dépenses, notifications, audit, paramètres
+- RLS activé et strict sur **toutes** les tables sensibles — testé pour qu'un caissier ne puisse jamais accéder aux données d'une autre boutique ni contourner ses permissions, même en appelant Supabase directement
+- Authentification Supabase Auth, deux parcours de connexion (Responsable / Caissier), protection de routes via middleware + vérification serveur
+- Page d'accueil, connexion, dashboard Responsable avec KPIs réels, module Produits (liste + recherche + pagination, création/édition/archivage via Server Actions vérifiées par permission)
+- **Caisse (POS) fonctionnelle de bout en bout** : ouverture de caisse, recherche produit, panier, encaissement via la fonction SQL `create_sale` (vente + lignes + paiement + déduction de stock dans une seule transaction), clôture de caisse avec calcul d'écart, reçu imprimable au format 80 mm
+- **Boutiques** : création, édition, activation/désactivation, KPIs par boutique (CA du mois, effectif, réf. en stock) — réservé au propriétaire
+- **Utilisateurs** : création de compte (Supabase Auth + profil + attribution boutique/rôle en une opération atomique côté serveur), désactivation/réactivation. Un utilisateur désactivé est déconnecté et bloqué dès sa prochaine requête (vérifié dans les deux layouts, pas seulement à la connexion)
+- PWA (manifest, service worker via `next-pwa`)
 
-## 2. Configurer le projet en local
+**Structuré mais à compléter** (le schéma, les policies RLS et les Server Actions existent déjà pour ces modules — il reste l'interface) :
+- Transferts entre boutiques, Inventaire physique, Achats (interface de réception), Retours (interface), Clients, Rapports/graphiques (recharts), Centre de notifications, Journal d'audit (lecture), Import/export CSV, mode sombre (tokens déjà en place dans `globals.css`), édition fine des permissions par rôle (la matrice par défaut est en base, l'écran de configuration reste à faire)
+
+Voir la section **Prochaines étapes** en bas de ce document pour l'ordre recommandé.
+
+## Stack technique
+
+Next.js 14 (App Router) · TypeScript strict · Tailwind CSS · Supabase (Postgres, Auth, Storage, Realtime, RLS) · React Hook Form + Zod · TanStack Query · next-pwa
+
+## Installation
+
 ```bash
-cp .env.local.example .env.local
-# Remplissez .env.local avec vos clés Supabase
 npm install
+cp .env.example .env.local
+# renseignez NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+```
+
+### Connexion à votre projet Supabase existant
+
+```bash
+npx supabase login
+npx supabase link --project-ref <votre-project-ref>
+npx supabase db push          # applique les migrations supabase/migrations/*.sql
+npx supabase db execute -f supabase/seed.sql   # données de démo optionnelles
+npm run db:types              # régénère types/database.types.ts depuis le schéma réel
+```
+
+### Créer le premier propriétaire (owner)
+
+Supabase Auth ne peut pas être seedé de façon fiable en SQL pur. Après `npm run dev` :
+
+1. Créez un compte via `supabase.auth.admin.createUser()` (script `scripts/create-owner.ts` fourni, à lancer avec `SUPABASE_SERVICE_ROLE_KEY` en variable d'environnement locale uniquement) ou depuis le dashboard Supabase (Authentication > Users > Add user).
+2. Passez ensuite `profiles.is_owner = true` pour cet utilisateur (SQL editor Supabase) :
+   ```sql
+   update public.profiles set is_owner = true where email = 'votre-email@exemple.com';
+   ```
+3. Connectez-vous sur `/login/responsable`.
+
+### Lancer en local
+
+```bash
 npm run dev
 ```
-Ouvrez http://localhost:3000
 
-## 3. Mettre le code sur GitHub
+## Sécurité — principes appliqués
+
+- **RLS toujours actif** : aucune table sensible n'est accessible sans policy explicite (voir `0009_rls_policies.sql`). Le frontend ne fait jamais office de mécanisme de sécurité — chaque Server Action rappelle `assertPermission()` qui interroge la même fonction SQL que RLS (`has_permission`), donc aucune divergence possible.
+- **Clé service role** : jamais importée hors de `lib/supabase/admin.ts`, protégée par le package `server-only`.
+- **Transactions atomiques** : la création d'une vente (`create_sale`), la réception d'achat et le retour sont des fonctions Postgres `SECURITY DEFINER` exécutées en une seule transaction — pas d'état incohérent possible entre vente, stock et paiement.
+- **Aucune suppression physique** de vente, produit ou boutique — suppression logique (`is_active`, `deleted_at`) uniquement.
+
+## Déploiement
+
+**Vercel** : connectez le dépôt GitHub, renseignez les 3 variables d'environnement du `.env.example` dans les Project Settings, déployez. Le build Next.js standard s'applique (`next build`).
+
+**Ne jamais committer** `.env` / `.env.local`.
+
+## Tests
+
 ```bash
-git init
-git add .
-git commit -m "Fondations de Ma librair"
-git branch -M main
-git remote add origin https://github.com/VOTRE-COMPTE/ma-librair.git
-git push -u origin main
+npm run test
 ```
+Les tests couvrent en priorité : permissions RLS (via clients Supabase de test avec des JWT différents), calcul de vente/stock, clôture de caisse. À étoffer au fur et à mesure (voir dossier `tests/`).
 
-## 4. Déployer sur Vercel (gratuit)
-1. Créez un compte sur https://vercel.com (connectez-le à votre GitHub).
-2. "Add New Project" → sélectionnez le dépôt `ma-librair`.
-3. Dans les paramètres du projet, ajoutez les variables d'environnement `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY` (les mêmes que dans `.env.local`).
-4. Cliquez sur "Deploy". Vercel vous donne une URL publique (ex : `ma-librair.vercel.app`), accessible partout, gratuitement.
+## Prochaines étapes recommandées
 
-## 5. Installer l'application sur téléphone
-- **Android (Chrome)** : ouvrez l'URL Vercel → menu ⋮ → "Ajouter à l'écran d'accueil".
-- **iPhone (Safari)** : ouvrez l'URL Vercel → bouton Partager → "Sur l'écran d'accueil".
-
-Cela installe "Ma librair" comme une vraie application, avec icône, sans passer par l'App Store/Play Store. Le mode hors-ligne fonctionne grâce au service worker (PWA) : les ventes et dépenses saisies sans connexion sont sauvegardées localement puis synchronisées automatiquement dès le retour d'internet.
-
-⚠️ Pour une publication officielle sur l'App Store / Play Store (facultatif), il faudrait empaqueter cette PWA avec un outil comme Capacitor, ce qui nécessite un compte développeur Apple (payant) et Google (payant, une fois).
-
-## Icônes de l'application
-Ajoutez vos icônes (192×192 et 512×512 px) dans `public/icons/` sous les noms `icon-192.png` et `icon-512.png`.
-
-## Sécurité
-Toutes les mesures de sécurité mises en place (protection des données, aucune information sensible dans le code, en-têtes HTTP, etc.) sont détaillées dans **`SECURITY.md`**. À lire avant la mise en production, notamment les 4 réglages à activer manuellement dans le tableau de bord Supabase.
-
-## Prochaines étapes de développement
-1. Gestion complète des articles (création, modification, code-barre auto, upload photo)
-2. Page mouvements de stock (historique entrées/sorties avec filtres)
-3. Gestion des boutiques et des comptes caissiers par l'admin
-4. Module finances (bénéfices, dépenses, pertes, budget, graphiques)
-5. Scan caméra du code-barre (html5-qrcode) en caisse
-6. Génération de reçu imprimable au format ticket de caisse
+1. ~~Interface Boutiques + Utilisateurs~~ ✅ fait
+2. Interface Achats (réception, appelle `receive_purchase_order_item`)
+3. Interface Retours (appelle `create_return`)
+4. Rapports + graphiques (`recharts`, tables `sales`/`sale_items` déjà indexées pour ça)
+5. Centre de notifications (table + trigger d'alerte stock déjà actifs, il manque l'UI de lecture)
+6. Tests automatisés étendus + CI GitHub Actions

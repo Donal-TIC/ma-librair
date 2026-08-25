@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 158 25% 12%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 158 25% 12%;
+
+  --primary: 152 51% 32%;          /* vert Katiola */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 211 47% 40%;        /* bleu Katiola */
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 150 20% 96%;
+  --muted-foreground: 158 10% 40%;
+
+  --success: 152 51% 32%;
+  --warning: 38 92% 50%;
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 150 15% 88%;
+  --input: 150 15% 88%;
+  --ring: 152 51% 32%;
+
+  --radius: 0.75rem;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Sora", system-ui, sans-serif;
+}
+
+.dark {
+  --background: 158 20% 7%;
+  --foreground: 150 15% 92%;
+
+  --card: 158 18% 10%;
+  --card-foreground: 150 15% 92%;
+
+  --primary: 152 45% 45%;
+  --primary-foreground: 158 25% 8%;
+
+  --secondary: 211 55% 55%;
+  --secondary-foreground: 158 25% 8%;
+
+  --muted: 158 15% 14%;
+  --muted-foreground: 150 10% 65%;
+
+  --border: 158 15% 18%;
+  --input: 158 15% 18%;
+  --ring: 152 45% 45%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Styles d'impression dédiés au reçu 80mm — le reste de l'UI est masqué */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt-print, #receipt-print * {
+    visibility: visible;
+  }
+  #receipt-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+  }
+}
